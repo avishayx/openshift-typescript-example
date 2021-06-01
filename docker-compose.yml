@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  redis:
+    container_name: redis
+    image: redis:6.2-alpine
+    command: redis-server --requirepass redispass
+  ts-node:
+    depends_on:
+      - redis
+    container_name: ts-node
+    build: .
+    command: sh -c "npm i && npm run start-dev"
+    ports:
+      - 8080:8080/tcp
+    environment:
+      HUSKY_SKIP_INSTALL: 1
+      REDIS_SERVICE_PASS: redispass
+      REDIS_SERVICE_HOST: redis
+    volumes:
+      - '.:/usr/app/'
+    restart: unless-stopped
